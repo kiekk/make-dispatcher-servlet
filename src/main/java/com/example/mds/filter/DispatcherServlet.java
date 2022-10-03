@@ -1,5 +1,7 @@
 package com.example.mds.filter;
 
+import com.example.mds.controller.UserController;
+
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +38,21 @@ public class DispatcherServlet implements Filter {
 
         String endPoint = servletRequest.getRequestURI().replaceAll(servletRequest.getContextPath(), "");
         System.out.println("endPoint : " + endPoint);
+
+        UserController userController = new UserController();
+        switch (endPoint) {
+            case "/join":
+                userController.join();
+                break;
+            case "/login":
+                userController.login();
+                break;
+            case "/user":
+                userController.user();
+                break;
+            default:
+                System.out.println("404 Not Found!!!!!");
+        }
 
     }
 
