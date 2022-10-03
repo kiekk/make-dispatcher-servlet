@@ -25,6 +25,17 @@ public class DispatcherServlet implements Filter {
         HttpServletRequest servletRequest = (HttpServletRequest) request;
         HttpServletResponse servletResponse = (HttpServletResponse) response;
 
+        System.out.println("Context Path : " + servletRequest.getContextPath());
+        System.out.println("Request URI : " + servletRequest.getRequestURI());
+        System.out.println("Request URL : " + servletRequest.getRequestURL());
+
+        /*
+        컨텍스트 패스가 없을 경우는 RequestURI 로 요청 정보를 분석해도 되지만
+        컨텍스트 패스가 있을 경우는 컨텍스트 패스를 제거해줘야 합니다.
+         */
+
+        String endPoint = servletRequest.getRequestURI().replaceAll(servletRequest.getContextPath(), "");
+        System.out.println("endPoint : " + endPoint);
 
     }
 
