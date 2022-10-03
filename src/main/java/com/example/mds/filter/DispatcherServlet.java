@@ -1,5 +1,6 @@
 package com.example.mds.filter;
 
+import com.example.mds.annotation.RequestMapping;
 import com.example.mds.controller.UserController;
 
 import javax.servlet.*;
@@ -7,7 +8,6 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /*
@@ -48,12 +48,19 @@ public class DispatcherServlet implements Filter {
 
         // Reflection 으로 UserController 의 메소드 정보를 찾아 url 정보와 매핑
         for (Method method : methods) {
-            if (endPoint.equals("/" + method.getName())) {
+            RequestMapping requestMapping = method.getDeclaredAnnotation(RequestMapping.class);
+
+            if(requestMapping == null) {
+                continue;
+            }
+
+            if (endPoint.equals(requestMapping.value())) {
                 try {
                     method.invoke(userController);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
+                break;
             }
         }
     }
