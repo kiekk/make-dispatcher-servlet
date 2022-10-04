@@ -68,6 +68,11 @@ public class DispatcherServlet implements Filter {
 
         RequestMappingInfo requestMappingInfo = mappingInfoMap.get(endPoint);
 
+        // 요청에 대한 매핑 정보가 없을 경우 에러 발생
+        if (requestMappingInfo == null) {
+            throw new RuntimeException("404 Not Found Exception : " + endPoint);
+        }
+
         Object target = requestMappingInfo.getTarget();
         Method method = requestMappingInfo.getMethod();
 
