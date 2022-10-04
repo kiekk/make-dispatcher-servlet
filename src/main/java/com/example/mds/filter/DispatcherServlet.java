@@ -2,6 +2,7 @@ package com.example.mds.filter;
 
 import com.example.mds.annotation.Controller;
 import com.example.mds.annotation.RequestMapping;
+import com.example.mds.annotation.ResponseBody;
 import com.example.mds.entity.RequestMappingInfo;
 import com.example.mds.util.ClassLoaderUtil;
 
@@ -122,8 +123,19 @@ public class DispatcherServlet implements Filter {
         Object target = requestMappingInfo.getTarget();
         Method method = requestMappingInfo.getMethod();
 
+
         try {
-            method.invoke(target);
+            Object invoke = method.invoke(target);
+
+            // @ResponseBody 가 있을 경우 MessageConverter로 처리, 없을 경우 ViewResolver로 처리
+            // MessageConverter
+            if (target.getClass().isAnnotationPresent(ResponseBody.class) || method.isAnnotationPresent(ResponseBody.class)) {
+                System.out.println("MessageConverter로 처리된 결과 : " + invoke);
+            } else {
+            // ViewResolver
+                System.out.println("ViewResolver로 처리된 결과 : " + invoke);
+            }
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
