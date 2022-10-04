@@ -2,6 +2,7 @@ package com.example.mds.filter;
 
 import com.example.mds.annotation.RequestMapping;
 import com.example.mds.controller.UserController;
+import com.example.mds.entity.RequestMappingInfo;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -9,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
 매번 요청 정보마다 Servlet을 생성하는 것은 비효율적이기 때문에
@@ -17,9 +20,31 @@ import java.lang.reflect.Method;
 @WebFilter(urlPatterns = "/*")
 public class DispatcherServlet implements Filter {
 
+    private final Map<String, RequestMappingInfo> mappingInfoMap = new HashMap<>();
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        /*
+            MappingRegistry 구현
+            초기화 시 먼저 RequestMapping 에 대한 정보를 저장해둡니다. (캐싱)
+         */
+        UserController userController = new UserController();
+        Method[] methods = userController.getClass().getDeclaredMethods();
 
+        for (Method method : methods) {
+            RequestMapping requestMapping = method.getDeclaredAnnotation(RequestMapping.class);
+
+            // 해당 메소드에 @RequestMapping 어노테이션이 없을 경우 Skip
+            if (requestMapping == null) {
+                continue;
+            }
+
+            // 이미 등록된 url 정보가 있을 경우 에러 발생
+            if (mappingInfoMap.get(requestMapping.value()) != null) {
+                throw new RuntimeException("Already Exists Request Mapping!!!!");
+            }
+            mappingInfoMap.put(requestMapping.value(), new RequestMappingInfo(userController, method));
+        }
     }
 
     @Override
@@ -41,28 +66,17 @@ public class DispatcherServlet implements Filter {
         String endPoint = servletRequest.getRequestURI().replaceAll(servletRequest.getContextPath(), "");
         System.out.println("endPoint : " + endPoint);
 
-        UserController userController = new UserController();
-        Method[] methods = userController.getClass().getDeclaredMethods();
-        // getMethods() : 상속된 메소드도 전부 가져옴
-        // getDeclaredMethods() : 해당 객체의 메소드만 가져옴
+        RequestMappingInfo requestMappingInfo = mappingInfoMap.get(endPoint);
 
-        // Reflection 으로 UserController 의 메소드 정보를 찾아 url 정보와 매핑
-        for (Method method : methods) {
-            RequestMapping requestMapping = method.getDeclaredAnnotation(RequestMapping.class);
+        Object target = requestMappingInfo.getTarget();
+        Method method = requestMappingInfo.getMethod();
 
-            if(requestMapping == null) {
-                continue;
-            }
-
-            if (endPoint.equals(requestMapping.value())) {
-                try {
-                    method.invoke(userController);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                break;
-            }
+        try {
+            method.invoke(target);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+
     }
 
     @Override
