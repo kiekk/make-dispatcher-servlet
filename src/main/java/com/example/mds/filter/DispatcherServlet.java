@@ -51,6 +51,15 @@ public class DispatcherServlet implements Filter {
                 continue;
             }
 
+            RequestMapping classRequestMapping = (RequestMapping) targetClass.getDeclaredAnnotation(RequestMapping.class);
+
+            // Controller의 @RequestMapping과 method의 @ReuqestMapping을 합치기 위한 변수
+            String mappingUrlInfo = null;
+            if (classRequestMapping != null) {
+                mappingUrlInfo = classRequestMapping.value();
+            }
+
+
             Method[] methods = targetClass.getDeclaredMethods();
 
             // 인스턴스화
@@ -75,10 +84,10 @@ public class DispatcherServlet implements Filter {
                 }
 
                 // 이미 등록된 url 정보가 있을 경우 에러 발생
-                if (mappingInfoMap.get(requestMapping.value()) != null) {
+                if (mappingInfoMap.get(mappingUrlInfo + requestMapping.value()) != null) {
                     throw new RuntimeException("Already Exists Request Mapping!!!!");
                 }
-                mappingInfoMap.put(requestMapping.value(), new RequestMappingInfo(instance, method));
+                mappingInfoMap.put(mappingUrlInfo + requestMapping.value(), new RequestMappingInfo(instance, method));
             }
         }
 

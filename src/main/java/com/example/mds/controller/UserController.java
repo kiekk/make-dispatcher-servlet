@@ -4,6 +4,7 @@ import com.example.mds.annotation.Controller;
 import com.example.mds.annotation.RequestMapping;
 
 @Controller
+@RequestMapping("/user")
 public class UserController {
 
     @RequestMapping("/join")
