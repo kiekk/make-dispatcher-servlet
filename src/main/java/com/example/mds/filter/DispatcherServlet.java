@@ -1,8 +1,9 @@
 package com.example.mds.filter;
 
+import com.example.mds.annotation.Controller;
 import com.example.mds.annotation.RequestMapping;
-import com.example.mds.controller.UserController;
 import com.example.mds.entity.RequestMappingInfo;
+import com.example.mds.util.ClassLoaderUtil;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -20,31 +21,67 @@ import java.util.Map;
 @WebFilter(urlPatterns = "/*")
 public class DispatcherServlet implements Filter {
 
+    private final String basePackage = "com.example.mds.controller";
     private final Map<String, RequestMappingInfo> mappingInfoMap = new HashMap<>();
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+
         /*
-            MappingRegistry 구현
-            초기화 시 먼저 RequestMapping 에 대한 정보를 저장해둡니다. (캐싱)
+            ComponentScan 구현
+            스캔할 package 명을 전달받아 하위에 있는 class를 전부 찾습니다.
+            그리고 해당 class에 @Controller 어노테이션이 있는 class만 매핑 작업을 합니다.
          */
-        UserController userController = new UserController();
-        Method[] methods = userController.getClass().getDeclaredMethods();
+        Class[] classes;
+        try {
+            classes = ClassLoaderUtil.getClasses(basePackage);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
-        for (Method method : methods) {
-            RequestMapping requestMapping = method.getDeclaredAnnotation(RequestMapping.class);
+        if (classes.length == 0) {
+            throw new RuntimeException("Classes Empty!!");
+        }
 
-            // 해당 메소드에 @RequestMapping 어노테이션이 없을 경우 Skip
-            if (requestMapping == null) {
+        for (Class targetClass : classes) {
+            // @Controller 어노테이션 여부 확인
+            boolean isController = targetClass.isAnnotationPresent(Controller.class);
+
+            if (!isController) {
                 continue;
             }
 
-            // 이미 등록된 url 정보가 있을 경우 에러 발생
-            if (mappingInfoMap.get(requestMapping.value()) != null) {
-                throw new RuntimeException("Already Exists Request Mapping!!!!");
+            Method[] methods = targetClass.getDeclaredMethods();
+
+            // 인스턴스화
+            Object instance;
+            try {
+                instance = targetClass.newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-            mappingInfoMap.put(requestMapping.value(), new RequestMappingInfo(userController, method));
+
+            /*
+                MappingRegistry 구현
+                초기화 시 먼저 RequestMapping 에 대한 정보를 저장해둡니다. (캐싱)
+             */
+
+            for (Method method : methods) {
+                RequestMapping requestMapping = method.getDeclaredAnnotation(RequestMapping.class);
+
+                // 해당 메소드에 @RequestMapping 어노테이션이 없을 경우 Skip
+                if (requestMapping == null) {
+                    continue;
+                }
+
+                // 이미 등록된 url 정보가 있을 경우 에러 발생
+                if (mappingInfoMap.get(requestMapping.value()) != null) {
+                    throw new RuntimeException("Already Exists Request Mapping!!!!");
+                }
+                mappingInfoMap.put(requestMapping.value(), new RequestMappingInfo(instance, method));
+            }
         }
+
     }
 
     @Override

@@ -1,7 +1,9 @@
 package com.example.mds.controller;
 
+import com.example.mds.annotation.Controller;
 import com.example.mds.annotation.RequestMapping;
 
+@Controller
 public class UserController {
 
     @RequestMapping("/join")
