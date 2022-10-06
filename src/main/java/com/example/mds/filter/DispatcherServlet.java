@@ -11,6 +11,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -132,6 +133,10 @@ public class DispatcherServlet implements Filter {
             // MessageConverter
             if (target.getClass().isAnnotationPresent(ResponseBody.class) || method.isAnnotationPresent(ResponseBody.class)) {
                 System.out.println("MessageConverter로 처리된 결과 : " + invoke);
+
+                PrintWriter writer = response.getWriter();
+                writer.println(invoke);
+                writer.close();
             } else {
                 // ViewResolver
                 System.out.println("ViewResolver로 처리된 결과 : " + invoke);
