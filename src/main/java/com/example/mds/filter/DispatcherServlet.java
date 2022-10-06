@@ -26,6 +26,8 @@ public class DispatcherServlet implements Filter {
     private final String basePackage = "com.example.mds.controller";
     private final Map<String, RequestMappingInfo> mappingInfoMap = new HashMap<>();
     private final String REDIRECT_PREFIX = "redirect:";
+    private final String VIEW_RESOLVER_PREFIX = "/WEB-INF/views/";
+    private final String VIEW_RESOLVER_SUFFIX = ".jsp";
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -150,7 +152,7 @@ public class DispatcherServlet implements Filter {
                     servletResponse.sendRedirect(result);
                 } else {
                     // Forward
-                    RequestDispatcher dispatcher = request.getRequestDispatcher(result);
+                    RequestDispatcher dispatcher = request.getRequestDispatcher(VIEW_RESOLVER_PREFIX + result + VIEW_RESOLVER_SUFFIX);
                     dispatcher.forward(servletRequest, servletResponse);
                 }
             }

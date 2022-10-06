@@ -18,12 +18,12 @@ public class TeamController {
     @RequestMapping("/login")
     public String login() {
         System.out.println("TeamController-login");
-        return "/team/login.jsp";
+        return "/team/login";
     }
 
     @RequestMapping("/user")
     public String user() {
         System.out.println("TeamController-user");
-        return "/team/user.jsp";
+        return "/team/user";
     }
 }

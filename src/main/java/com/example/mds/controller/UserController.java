@@ -10,19 +10,19 @@ public class UserController {
     @RequestMapping("/join")
     public String join() {
         System.out.println("UserController-join");
-        return "/user/join.jsp";
+        return "/user/join";
     }
 
     @RequestMapping("/login")
     public String login() {
         System.out.println("UserController-login");
-        return "/user/login.jsp";
+        return "/user/login";
     }
 
     @RequestMapping("/user")
     public String user() {
         System.out.println("UserController-user");
-        return "/user/user.jsp";
+        return "/user/user";
     }
 
     @RequestMapping("/team")
