@@ -132,8 +132,10 @@ public class DispatcherServlet implements Filter {
             if (target.getClass().isAnnotationPresent(ResponseBody.class) || method.isAnnotationPresent(ResponseBody.class)) {
                 System.out.println("MessageConverter로 처리된 결과 : " + invoke);
             } else {
-            // ViewResolver
+                // ViewResolver
                 System.out.println("ViewResolver로 처리된 결과 : " + invoke);
+                RequestDispatcher dispatcher = request.getRequestDispatcher(String.valueOf(invoke));
+                dispatcher.forward(request, response);
             }
 
         } catch (Exception e) {
