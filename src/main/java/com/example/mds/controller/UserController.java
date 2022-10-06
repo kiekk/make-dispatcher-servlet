@@ -25,4 +25,10 @@ public class UserController {
         return "/user/user.jsp";
     }
 
+    @RequestMapping("/team")
+    public String team() {
+        System.out.println("UserController-team");
+        return "redirect:/team/user";
+    }
+
 }

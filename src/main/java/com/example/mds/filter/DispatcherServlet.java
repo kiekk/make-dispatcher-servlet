@@ -24,6 +24,7 @@ public class DispatcherServlet implements Filter {
 
     private final String basePackage = "com.example.mds.controller";
     private final Map<String, RequestMappingInfo> mappingInfoMap = new HashMap<>();
+    private final String REDIRECT_PREFIX = "redirect:";
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -134,8 +135,19 @@ public class DispatcherServlet implements Filter {
             } else {
                 // ViewResolver
                 System.out.println("ViewResolver로 처리된 결과 : " + invoke);
-                RequestDispatcher dispatcher = request.getRequestDispatcher(String.valueOf(invoke));
-                dispatcher.forward(request, response);
+
+                String result = String.valueOf(invoke);
+
+                // Redirect 여부 확인
+                if (result.startsWith(REDIRECT_PREFIX)) {
+                    // Redirect
+                    result = result.replaceAll(REDIRECT_PREFIX, "");
+                    servletResponse.sendRedirect(result);
+                } else {
+                    // Forward
+                    RequestDispatcher dispatcher = request.getRequestDispatcher(result);
+                    dispatcher.forward(servletRequest, servletResponse);
+                }
             }
 
         } catch (Exception e) {
