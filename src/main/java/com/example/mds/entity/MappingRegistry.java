@@ -4,6 +4,7 @@ import com.example.mds.annotation.Controller;
 import com.example.mds.annotation.RequestMapping;
 import com.example.mds.util.ClassLoaderUtil;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -12,14 +13,20 @@ import java.util.Map;
 public class MappingRegistry {
     private static final Map<String, RequestMappingInfo> pathLookup = new HashMap<>();
 
-    public static RequestMappingInfo getHandler(HttpServletRequest request) {
+    public static RequestMappingInfo getHandler(ServletRequest request) {
 
         /*
         컨텍스트 패스가 없을 경우는 RequestURI 로 요청 정보를 분석해도 되지만
         컨텍스트 패스가 있을 경우는 컨텍스트 패스를 제거해줘야 합니다.
          */
 
-        String endPoint = request.getRequestURI().replaceAll(request.getContextPath(), "");
+        HttpServletRequest servletRequest = (HttpServletRequest) request;
+
+        System.out.println("Context Path : " + servletRequest.getContextPath());
+        System.out.println("Request URI : " + servletRequest.getRequestURI());
+        System.out.println("Request URL : " + servletRequest.getRequestURL());
+
+        String endPoint = servletRequest.getRequestURI().replaceAll(servletRequest.getContextPath(), "");
 
         RequestMappingInfo requestMappingInfo = pathLookup.get(endPoint);
 

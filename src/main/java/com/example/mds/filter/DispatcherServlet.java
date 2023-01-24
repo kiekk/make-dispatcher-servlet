@@ -8,7 +8,6 @@ import com.example.mds.resolver.ResolverFactory;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpServletRequest;
 
 /*
 매번 요청 정보마다 Servlet을 생성하는 것은 비효율적이기 때문에
@@ -28,13 +27,7 @@ public class DispatcherServlet implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) {
         System.out.println("Start Dispatcher");
 
-        HttpServletRequest servletRequest = (HttpServletRequest) request;
-
-        System.out.println("Context Path : " + servletRequest.getContextPath());
-        System.out.println("Request URI : " + servletRequest.getRequestURI());
-        System.out.println("Request URL : " + servletRequest.getRequestURL());
-
-        RequestMappingInfo requestMappingInfo = MappingRegistry.getHandler(servletRequest);
+        RequestMappingInfo requestMappingInfo = MappingRegistry.getHandler(request);
 
         try {
             Object invoke = RequestHandlerAdapter.handle(requestMappingInfo);
