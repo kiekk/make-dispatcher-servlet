@@ -5,5 +5,8 @@
 </head>
 <body>
 Team Login Page
+
+id : ${id}
+name : ${name}
 </body>
 </html>
