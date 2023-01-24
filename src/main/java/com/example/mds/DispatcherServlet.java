@@ -1,4 +1,4 @@
-package com.example.mds.filter;
+package com.example.mds;
 
 import com.example.mds.entity.MappingRegistry;
 import com.example.mds.entity.RequestHandlerAdapter;
@@ -16,11 +16,11 @@ import javax.servlet.annotation.WebFilter;
 @WebFilter(urlPatterns = "/*")
 public class DispatcherServlet implements Filter {
 
-    private final String basePackage = "com.example.mds.controller";
-
     @Override
     public void init(FilterConfig filterConfig) {
-        MappingRegistry.handlerMapping(basePackage);
+        // DispatcherServlet 을 상위 패키지에 위치
+        // DispatcherServlet 하위 패키지를 모두 스캔
+        MappingRegistry.handlerMapping(this.getClass().getPackageName());
     }
 
     @Override
