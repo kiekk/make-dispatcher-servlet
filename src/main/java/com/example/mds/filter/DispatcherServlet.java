@@ -2,6 +2,7 @@ package com.example.mds.filter;
 
 import com.example.mds.annotation.ResponseBody;
 import com.example.mds.entity.MappingRegistry;
+import com.example.mds.entity.RequestHandlerAdapter;
 import com.example.mds.entity.RequestMappingInfo;
 
 import javax.servlet.*;
@@ -43,9 +44,9 @@ public class DispatcherServlet implements Filter {
 
         Object target = requestMappingInfo.getTarget();
         Method method = requestMappingInfo.getMethod();
-        
+
         try {
-            Object invoke = method.invoke(target);
+            Object invoke = RequestHandlerAdapter.handle(requestMappingInfo);
 
             // @ResponseBody 가 있을 경우 MessageConverter로 처리, 없을 경우 ViewResolver로 처리
             // MessageConverter
