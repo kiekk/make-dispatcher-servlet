@@ -4,6 +4,7 @@ import com.example.mds.annotation.Controller;
 import com.example.mds.annotation.RequestMapping;
 import com.example.mds.util.ClassLoaderUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +12,15 @@ import java.util.Map;
 public class MappingRegistry {
     private static final Map<String, RequestMappingInfo> pathLookup = new HashMap<>();
 
-    public static RequestMappingInfo getHandler(String endPoint) {
+    public static RequestMappingInfo getHandler(HttpServletRequest request) {
+
+        /*
+        컨텍스트 패스가 없을 경우는 RequestURI 로 요청 정보를 분석해도 되지만
+        컨텍스트 패스가 있을 경우는 컨텍스트 패스를 제거해줘야 합니다.
+         */
+
+        String endPoint = request.getRequestURI().replaceAll(request.getContextPath(), "");
+
         RequestMappingInfo requestMappingInfo = pathLookup.get(endPoint);
 
         // 요청에 대한 매핑 정보가 없을 경우 에러 발생
