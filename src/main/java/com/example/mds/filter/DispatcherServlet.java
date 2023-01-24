@@ -42,15 +42,12 @@ public class DispatcherServlet implements Filter {
 
         RequestMappingInfo requestMappingInfo = MappingRegistry.getHandler(servletRequest);
 
-        Object target = requestMappingInfo.getTarget();
-        Method method = requestMappingInfo.getMethod();
-
         try {
             Object invoke = RequestHandlerAdapter.handle(requestMappingInfo);
 
             // @ResponseBody 가 있을 경우 MessageConverter로 처리, 없을 경우 ViewResolver로 처리
             // MessageConverter
-            if (target.getClass().isAnnotationPresent(ResponseBody.class) || method.isAnnotationPresent(ResponseBody.class)) {
+            if (requestMappingInfo.isRestController()) {
                 System.out.println("MessageConverter로 처리된 결과 : " + invoke);
 
                 PrintWriter writer = response.getWriter();
