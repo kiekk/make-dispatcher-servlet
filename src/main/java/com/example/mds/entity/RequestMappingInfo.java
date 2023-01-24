@@ -1,15 +1,19 @@
 package com.example.mds.entity;
 
+import com.example.mds.annotation.ResponseBody;
+
 import java.lang.reflect.Method;
 
 public class RequestMappingInfo {
 
     private Object target;
     private Method method;
+    private boolean isRestController;
 
     public RequestMappingInfo(Object target, Method method) {
         this.target = target;
         this.method = method;
+        this.isRestController = target.getClass().isAnnotationPresent(ResponseBody.class) || method.isAnnotationPresent(ResponseBody.class);
     }
 
     public Object getTarget() {
@@ -26,5 +30,13 @@ public class RequestMappingInfo {
 
     public void setMethod(Method method) {
         this.method = method;
+    }
+
+    public boolean isRestController() {
+        return isRestController;
+    }
+
+    public void setRestController(boolean restController) {
+        isRestController = restController;
     }
 }
